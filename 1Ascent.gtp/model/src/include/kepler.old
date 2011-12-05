@@ -1,0 +1,64 @@
+#ifndef _GESOP_KEPLER
+#define _GESOP_KEPLER
+
+	#ifndef _GESOP_COMMOM_INC
+		#define _GESOP_COMMOM_INC
+		#include <math.h>
+		#include <stdlib.h>
+		#include <stdio.h>
+		#include <string.h>
+		#include <windows.h>
+	#endif
+
+/* Definitions */
+#define	MERCURY 1
+#define VENUS 2
+#define EARTH 3
+#define MARS 4
+#define JUPITER 5
+#define SATURN 6
+#define URANUS 7
+#define NEPTUNE 8
+#define PLUTO 9
+#define MOON 10
+#define SUN 11
+#define SOLAR_SYSTEM_BARYCENTRE 12
+#define EARTH_MOON_BARYCENTRE 13
+#define NUTATIONS 14
+#define LIBRATIONS 15
+
+
+
+/* Declarations */
+typedef void ( * ephFunc) (double*, int*, int*, double*);
+
+HINSTANCE	EphLibrary;	
+ephFunc		GetEph;
+double		AU;
+double		gmue[12];
+
+
+
+/* Functions */
+void init_constants();
+
+void init_ephemeris(
+	HINSTANCE	*hLibrary,
+	ephFunc		*Func1,
+	int			*error
+);
+
+void compute_ephemeris(
+	ephFunc		Func1,
+	double		*julian_date,
+	int			*target_planet,
+	int			*center_planet,
+	double		ephemeris[6]
+);
+
+void free_ephemeris(
+	HINSTANCE	hLibrary
+);
+
+
+#endif

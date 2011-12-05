@@ -1,0 +1,108 @@
+/*	This file contains the functions
+
+	init_constants()
+	compute_ephemeris()
+	free_ephemeris()
+
+*/
+
+#include "kepler.h"
+#include "../cspice/include/SpiceUsr.h"
+//#include "../cspice/include/SpiceZpr.h"
+
+/* specifically, uses
+		furnsh_c.c
+		spkez_c.c
+		unload_c.c
+	these need to be included in the compiler directive
+*/
+
+/**************************************************************************************/
+
+void init_constants()
+{
+	AU    	= 149597870.66;
+
+	/* JPL DE-405 GRAVITATIONAL CONSTANTS in m³/s² */
+	gmue[0] =            0.0   *1.0e9;
+	gmue[1] =        22032.080 *1.0e9;		//Mercury
+	gmue[2] =       324858.599 *1.0e9;		//Venus
+	gmue[3] =       398600.433 *1.0e9;		//Earth	
+	gmue[4] =        42828.314 *1.0e9;		//Mars
+	gmue[5] =    126712767.863 *1.0e9;		//Jupiter
+	gmue[6] =     37940626.063 *1.0e9;		//Saturn
+	gmue[7] =      5794549.007 *1.0e9;		//Uranus
+	gmue[8] =      6836534.064 *1.0e9;		//Neptune
+	gmue[9] =          981.601 *1.0e9;		//Pluto
+	gmue[10]=         4902.80058 *1.0e9;	//Moon
+	gmue[11]= 132712440017.987 *1.0e9;		//Sun
+	
+}
+
+
+void init_ephemeris(
+	HINSTANCE	*hLibrary,
+	ephFunc		*Func1,
+	int			*error)
+{
+	*error = 0;
+
+	*hLibrary = LoadLibrary("C:/Users/shimmin/Documents/bw1trajectory/STK/3.1CaptureTimeLCI.gtp/model/src/ephemeris/jpleph-km.dll");	// Load the DLL now
+	if (*hLibrary != NULL) {
+		*Func1 = (ephFunc) GetProcAddress(*hLibrary, "PLEPH");
+		if (*Func1 == NULL) {
+			printf("Error: cannot find function pleph_ in library jpleph-km.dll!\n");
+			_flushall();
+			*error = 1;
+		}
+	} else {
+		printf("Error: cannot load library jpleph-km.dll!\n");
+		_flushall();
+		*error = 1;
+	}
+
+//	furnsh_c ( "../src/ephemeris/de421.bsp" );
+//	furnsh_c ( "../../ephemeris/de421.bsp" );
+	furnsh_c ( "C:/Users/shimmin/Documents/bw1trajectory/STK/3.1CaptureTimeLCI.gtp/model/src/ephemeris/de421.bsp" );
+}
+
+
+
+
+void compute_ephemeris(
+	ephFunc Func1,
+	double	*julian_date,
+	int		*target_planet,
+	int		*center_planet,
+ 	double	ephemeris[6])
+{
+	(Func1)( julian_date, target_planet, center_planet, ephemeris );
+}
+
+
+
+
+void free_ephemeris(
+	HINSTANCE hLibrary)
+{
+	FreeLibrary(hLibrary);		// Unload DLL from memory
+
+//	unload_c ( "../src/ephemeris/de421.bsp" );
+//	unload_c ( "../../ephemeris/de421.bsp" );
+	unload_c ( "C:/Users/shimmin/Documents/bw1trajectory/STK/3.1CaptureTimeLCI.gtp/model/src/ephemeris/de421.bsp" );
+}
+
+
+
+void compute_ephemeris(
+	const int		TARG,
+	const double	ET,
+	const char		*ref,
+	const char		*abcorr,
+	const int		OBS,
+	double			*starg,
+	double			*lt
+	)
+{
+	spkez_c();
+}
